@@ -1,10 +1,10 @@
 [package]
-name = "client"
+name = "server"
 version = "0.0.0"
 edition = "2021"
 
 [dependencies]
-server = { path = "../server" }
+keycodes = "0.1.0"
+async-trait = "0.1.64"
 crossterm = "0.26.0"
 tokio = { version = "1.25.0", features = ["full"] }
-keycodes = "0.1.0"
