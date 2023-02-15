@@ -1,18 +1,20 @@
 use async_trait::async_trait;
-use crossterm::{
-    style::{Attribute, Color, PrintStyledContent, Stylize},
-    ExecutableCommand,
-};
+use crossterm::ExecutableCommand;
 
 #[async_trait]
 pub trait VirtualTerminal {
     async fn on_input(&mut self, keycode: u8);
+    async fn resize(&mut self, cols: u16, rows: u16);
+
     async fn render(&self) -> Vec<u8>;
 }
 
 #[derive(Debug, Clone, Default)]
 pub struct VoidStringInputTerminal {
     input_buffer: Vec<u8>,
+
+    cols: u16,
+    rows: u16,
 }
 
 #[async_trait]
@@ -21,6 +23,11 @@ impl VirtualTerminal for VoidStringInputTerminal {
         if keycode.is_ascii() {
             self.input_buffer.push(keycode)
         }
+    }
+
+    async fn resize(&mut self, cols: u16, rows: u16) {
+        self.cols = cols;
+        self.rows = rows;
     }
 
     async fn render(&self) -> Vec<u8> {
