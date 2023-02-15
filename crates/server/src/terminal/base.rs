@@ -1,3 +1,5 @@
+use std::process::exit;
+
 use async_trait::async_trait;
 use crossterm::ExecutableCommand;
 
@@ -20,6 +22,10 @@ pub struct VoidStringInputTerminal {
 #[async_trait]
 impl VirtualTerminal for VoidStringInputTerminal {
     async fn on_input(&mut self, keycode: u8) {
+        if keycode == b'q' {
+            panic!()
+        }
+
         if keycode.is_ascii() {
             self.input_buffer.push(keycode)
         }
