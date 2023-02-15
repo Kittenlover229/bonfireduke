@@ -1,13 +1,9 @@
-use std::fmt::format;
-use std::io::stdout;
+use std::io::{stdout, Write};
 use std::sync::Arc;
 use std::time::Duration;
 
-use crossterm::cursor::{Hide, MoveTo, Show};
+use crossterm::cursor::{Hide, Show};
 use crossterm::event::{poll as poll_terminal_event, read as read_terminal_event, Event, KeyCode};
-use crossterm::queue;
-use crossterm::style::{PrintStyledContent, Stylize};
-use crossterm::terminal::Clear;
 use crossterm::{
     execute,
     terminal::{disable_raw_mode, enable_raw_mode, EnterAlternateScreen, LeaveAlternateScreen},
@@ -68,6 +64,7 @@ async fn main() -> io::Result<()> {
             }
             yield_now().await
         }
+        unreachable!()
     });
 
     loop {
@@ -76,13 +73,9 @@ async fn main() -> io::Result<()> {
             Some(keycode) => {
                 let mut vt = vt.lock().await;
                 vt.on_input(keycode).await;
-                execute!(
-                    stdout(),
-                    MoveTo(0, 0),
-                    Clear(crossterm::terminal::ClearType::All),
-                    PrintStyledContent(format!("{keycode:?}").magenta())
-                )
-                .unwrap();
+                let rendered = vt.render().await;
+                stdout().write(&rendered)?;
+                stdout().flush()?;
             }
         }
     }
