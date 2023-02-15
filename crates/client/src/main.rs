@@ -39,7 +39,13 @@ pub fn key_event_to_keycode(event: KeyCode) -> u8 {
 async fn main() -> io::Result<()> {
     let vt = Arc::new(Mutex::new(VoidStringInputTerminal::default()));
 
-    execute!(stdout(), EnterAlternateScreen, Hide,)?;
+    execute!(stdout(), EnterAlternateScreen, Hide)?;
+
+    std::panic::set_hook(Box::new(|panicinfo| {
+        eprint!("{panicinfo}");
+        disable_raw_mode().unwrap();
+        execute!(stdout(), LeaveAlternateScreen, Show).unwrap();
+    }));
 
     enable_raw_mode()?;
 
